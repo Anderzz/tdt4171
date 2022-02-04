@@ -10,14 +10,23 @@ def forward(T, O, f):
     Args:
         T (ndarray):  transition matrix
         O (ndarray)): model matrix
-        f (ndarray):  message
+        f (ndarray):  forward message
 
     """
     return normalize(O @ T.T @ f)
 
-def backward(T, O, f):
+def backward(T, O, b):
+    """
+    equation 14.12
 
-    return normalize(T @ O @ f)
+    Args:
+        T (ndarray):  transition matrix
+        O (ndarray)): model matrix
+        b (ndarray):  backward message
+
+    """
+
+    return normalize(T @ O @ b)
 
 #define transition matrix T and model matrices O[0] & O[1]
 T = np.array([[0.7, 0.3],
@@ -53,6 +62,8 @@ def main():
             f = forward(T, O[0], f)
         if not e: #use the second model matrix
             f = forward(T, O[1], f)
+
+        #store the vectors in a list for use later
         f_list.append(f)
         print(f"Day {day+1} [rain / not_rain]: {f}")
     ############# \Task 2 #############
@@ -64,6 +75,8 @@ def main():
             b = backward(T, O[0], b)
         if not e: #use the second model matrix
             b = backward(T, O[1], b)
+
+        #store the vectors in a list in order to compute the smoothed probabilities
         b_list.append(b)
         print(f"Day {day+1} [rain / not_rain]: {b}")
 
@@ -71,9 +84,9 @@ def main():
     day = 0
     print(f"\n\nTask 3: Smoothed values")
     for f, b in zip(f_list, b_list[::-1]):
-        day += 1
         res = normalize(f*b)
         print(f"Day {day} [rain / not_rain]: {res}")
+        day += 1
     ############# \Task 3 #############
 
 if __name__ == "__main__":
