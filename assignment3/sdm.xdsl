@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This network was created in GeNIe Academic, which can be used for academic teaching and research purposes only -->
+<smile version="1.0" id="Network1" numsamples="10000" discsamples="10000">
+	<nodes>
+		<deterministic id="Friends_staying">
+			<state id="Yes" />
+			<state id="No" />
+			<resultingstates>No</resultingstates>
+		</deterministic>
+		<deterministic id="Worked_hard">
+			<state id="Yes" />
+			<state id="Moderately" />
+			<state id="No" />
+			<resultingstates>Yes</resultingstates>
+		</deterministic>
+		<cpt id="Well_off_at_school">
+			<state id="Very" />
+			<state id="Medium" />
+			<state id="Bad" />
+			<parents>Worked_hard</parents>
+			<probabilities>0.85 0.1 0.05 0.1 0.7 0.2 0 0.3 0.7</probabilities>
+		</cpt>
+		<cpt id="Want_to_go">
+			<state id="GoHome" />
+			<state id="Stay" />
+			<parents>Friends_staying Well_off_at_school</parents>
+			<probabilities>0.9 0.1 0.7 0.3 0.5 0.5 0.95 0.05 0.8 0.2 0.7 0.3</probabilities>
+		</cpt>
+		<decision id="decision">
+			<state id="Train" />
+			<state id="Plane" />
+			<state id="Stay" />
+		</decision>
+		<utility id="Willingness">
+			<parents>Want_to_go decision</parents>
+			<utilities>0.4 0.5 0.1 0 0 1</utilities>
+		</utility>
+		<deterministic id="Airplane_model">
+			<state id="Boeing737" />
+			<state id="Other" />
+			<resultingstates>Boeing737</resultingstates>
+		</deterministic>
+		<cpt id="Crash">
+			<state id="Crash" />
+			<state id="NoCrash" />
+			<parents>Airplane_model</parents>
+			<probabilities>0.01 0.99 0.02 0.98</probabilities>
+		</cpt>
+		<deterministic id="Vaccinated">
+			<state id="True" />
+			<state id="False" />
+			<resultingstates>True</resultingstates>
+		</deterministic>
+		<deterministic id="Current_Pandemic">
+			<state id="True" />
+			<state id="False" />
+			<resultingstates>True</resultingstates>
+		</deterministic>
+		<cpt id="Health_risks">
+			<state id="High" />
+			<state id="Medium" />
+			<state id="Low" />
+			<parents>Vaccinated Current_Pandemic</parents>
+			<probabilities>0.3 0.6 0.1 0.05 0.1 0.85 0.3 0.65 0.05 0.05 0.1 0.85</probabilities>
+		</cpt>
+		<cpt id="General_Safety">
+			<state id="High" />
+			<state id="Medium" />
+			<state id="Low" />
+			<parents>Crash Health_risks</parents>
+			<probabilities>0 0.01 0.99 0 0.02 0.98 0 0.03 0.97 0.3 0.4 0.3 0.5 0.4 0.1 0.8 0.15 0.04999999999999993</probabilities>
+		</cpt>
+		<utility id="safety">
+			<parents>General_Safety decision</parents>
+			<utilities>0.3 0.6 0 0.3 0.5 0.1 0.2 0.4 0.4</utilities>
+		</utility>
+		<cpt id="Traffic">
+			<state id="Heavy" />
+			<state id="Average" />
+			<state id="Light" />
+			<parents>Current_Pandemic</parents>
+			<probabilities>0.3 0.4 0.3 0.3333333333333333 0.3333333333333333 0.3333333333333333</probabilities>
+		</cpt>
+		<cpt id="Price">
+			<state id="Expensive" />
+			<state id="Affordable" />
+			<state id="Cheap" />
+			<parents>Traffic</parents>
+			<probabilities>0.8 0.15 0.05 0.4 0.4 0.2 0.1 0.3 0.6</probabilities>
+		</cpt>
+		<utility id="cost">
+			<parents>Price decision</parents>
+			<utilities>0.25 0.25 0.5 0.4 0.4 0.2 0.4 0.6 0</utilities>
+		</utility>
+	</nodes>
+	<extensions>
+		<genie version="1.0" app="GeNIe 3.0.6518.0 ACADEMIC" name="Network1">
+			<node id="Willingness">
+				<name>Willingness</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>147 151 233 204</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="decision">
+				<name>Go home for easter</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>389 19 566 103</position>
+				<barchart active="true" width="154" height="89" />
+			</node>
+			<node id="safety">
+				<name>Safety</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>432 162 518 215</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="cost">
+				<name>Cost</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>753 151 839 204</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="Current_Pandemic">
+				<name>Current Pandemic</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>925 537 1027 603</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="Well_off_at_school">
+				<name>Well off at school</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>236 360 331 419</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="Want_to_go">
+				<name>Want to</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>157 264 223 305</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="Friends_staying">
+				<name>Friends staying</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>46 357 139 417</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="Worked_hard">
+				<name>Worked hard</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>248 501 330 554</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="Airplane_model">
+				<name>Airplane model</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>435 569 524 627</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="General_Safety">
+				<name>General Safety</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>435 331 519 383</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="Crash">
+				<name>Crash</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>455 486 501 514</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="Vaccinated">
+				<name>Vaccinated</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>676 542 751 591</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="Health_risks">
+				<name>Health risks</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>678 396 747 439</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="Traffic">
+				<name>Traffic</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>953 294 1002 324</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+			<node id="Price">
+				<name>Price</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>773 296 816 322</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+		</genie>
+	</extensions>
+</smile>
