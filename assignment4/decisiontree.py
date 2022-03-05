@@ -8,9 +8,12 @@ import string
 random.seed(0)
 
 class Node:
-    def __init__(self, children, parents):
+    def __init__(self, children=None, parents=None, right=None, left=None, value=None):
         self.children = []
         self.parents = []
+        self.right = right
+        self.left = left
+        self.value = value
 
     def print_children(self):
         print(f"Children: {self.children}")
@@ -30,15 +33,15 @@ def remainder(tar, attr, p, n, examples):
     sum = 0
     for split in splits:
         try:
-            pk = split[tar].value_counts()[1]
+            pk = split[tar].value_counts()[0]
         except:
             pk = 0
         try:
-            nk = split[tar].value_counts()[2]
+            nk = split[tar].value_counts()[1]
         except:
             nk = 0
-        
-    sum += ((pk + nk)/(p + n)) * B(pk/(pk + nk))
+
+        sum += ((pk + nk)/(p + n)) * B(pk/(pk + nk))
     return sum
 
 def importance(tar, attrs, examples, rand=False):
@@ -53,46 +56,47 @@ def importance(tar, attrs, examples, rand=False):
 def get_id():
     return (''.join(random.choices(string.ascii_lowercase, k=4)))
 
-def learn_decision_tree(examples, attributes, dot, parent_examples=()):
+def learn_decision_tree(examples, attributes, dot=None, parent_examples=()):
     if len(examples) == 0:
         return plurality_values(parent_examples)
     elif same_classification(examples):
         #return the classification
         classific = examples[target].unique()[0]
         dot.node(get_id(), str(classific))
-        return classific
+        return [get_id(), classific]
     elif len(attributes) == 0:
         return plurality_values(examples)
     
     #find the most important attribute
     gain = {}
-    attributes = train.columns
+    dict = {}
+    attributes = examples.columns
     for col in attributes:
-        gain[col] = importance(target, col, train)
+        gain[col] = importance(target, col, examples, rand=True)
     #remove the column '1.5'
     try: del gain[target]
     except: pass
     A = max(gain, key = gain.get)
-    dot.node(get_id(), str(A))
-    
+    ide = str(id(A))
+    dot.node(ide, label = A)
+    dict_list = {}
     for v in examples[A].unique():
-        ex = examples[examples[A]==v]
+        exs = examples[examples[A]==v]
         new_attrs = attributes.copy().drop(A)
-        subtree = learn_decision_tree(ex, new_attrs, dot, examples)
-        
+        subtree = learn_decision_tree(exs, new_attrs, dot, examples)
+        dot.edge(ide, subtree[0], label = str(v))
+        dict_list[v] = subtree[1]
+    dict[A] = dict_list
+    return [ide, dict]
 
 
 
 def plurality_values(e):
-    return e[target].mode()[0]
+    return [get_id(), e[target].mode()[0]]
 
 def same_classification(e: pd.DataFrame):
     e=e.to_numpy()
     return((e==e[0]).all())
-
-
-
-
 
 
 
@@ -102,11 +106,15 @@ test = pd.read_csv("test.csv")
 df = pd.DataFrame(train)
 gain = {}
 attributes = train.columns
-for col in attributes:
-   gain[col] = importance(target, col, train)
-#remove the column '1.5'
-try: del gain[target]
-except: pass
-A = max(gain, key = gain.get)
-for v in train[A].unique():
-    print(v)
+
+graph = Digraph()
+
+def main():
+    dot = Digraph('graf', filename='graf_out.gv')
+    #res = importance(target, attributes, train)
+    res=learn_decision_tree(train,attributes,dot,None)
+    print(res)
+    graph.view()
+
+if __name__ == "__main__":
+    main()
