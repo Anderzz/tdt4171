@@ -24,9 +24,7 @@ def B(q):
     return 0 if q == 1 or q == 0 else -(q*np.log2(q) + (1-q)*np.log2(1-q))
 
 def remainder(T, A, p, n, examples):
-    #An attribute A with d distinct values divides the training set E into subsets E1,...,Ed
-    #distinct_val = examples[A].unique()
-    distinct_val = [1,2]
+    distinct_val = examples[A].unique()
     splits = []
     for val in distinct_val:
         splits.append(examples[examples[A] == val])
@@ -46,9 +44,10 @@ def remainder(T, A, p, n, examples):
     return sum
 
 def importance(tar, A, examples):
+    #positive
     p = examples[tar].value_counts()[1]
+    #negative
     n = examples[tar].value_counts()[2]
-
     return B(p/(p+n)) - remainder(tar, A, p, n, examples)
 
 def get_id():
@@ -70,8 +69,10 @@ def learn_decision_tree(examples, attributes, dot=None, parent_examples=()):
     for col in attributes:
         gain[col] = importance(target, col, examples)
     print(gain)
-
-    A = max(gain, key = gain.get)
+    
+    #A = max(gain, key = gain.get)
+    max_list = sorted(gain.items(), key=lambda x: x[1], reverse=True)
+    A = max_list[1][0] if max_list[0][0] == target else max_list[0][0]
     print(A)
     #for v in examples[A].unique():
     #    exs = examples[examples[A]==v]
