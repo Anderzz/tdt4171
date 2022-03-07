@@ -68,6 +68,12 @@ def get_id():
     return (''.join(random.choices(string.ascii_lowercase, k=10)))
 
 
+def plurality_values(e, tree=None):
+    #return the most common value
+    value = e[target].mode()[0]
+    id = get_id()
+    tree.node(id, label = str(value))
+    return [id, str(value)]
 
 def same_classification(e: pd.Series, tree: Digraph):
     #return the classification
@@ -109,25 +115,6 @@ def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
         
         dict[A] = dict_list
         return [id, dict]
-
-
-
-def plurality_values(e, tree=None):
-    # value = e[target].mode()[0]
-    # id = get_id()
-    # tree.node(id, label = str(value)+'plurality')
-    # return [id, str(value)]
-    value = e[target].value_counts().idxmax()
-    if value == 1:
-        id = get_id()
-        tree.node(id, label = '1+plura')
-        return [id, 'Died']
-
-    id = get_id()
-    tree.node(id, label = '2+plura')
-    return [id, 'Survived']
-
-
 
 
 
