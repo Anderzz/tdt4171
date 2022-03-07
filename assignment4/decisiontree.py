@@ -1,9 +1,9 @@
+from msilib.schema import Class
 import numpy as np
 import pandas as pd
 from graphviz import Digraph
 import random
 import string
-import uuid
 
 random.seed(0)
 target = '1.5'
@@ -20,9 +20,13 @@ class Node:
 
 
 def B(q):
+    #p. 1222 in the book
+    #returns the entropy
     return 0 if q == 1 or q == 0 else -(q*np.log2(q) + (1-q)*np.log2(1-q))
 
 def remainder(T, A, p, n, examples):
+    #p 1223 in the book
+    #returns the expected remaining entropy after testing A
     distinct_val = examples[A].unique()
     splits = []
     for val in distinct_val:
@@ -43,39 +47,44 @@ def remainder(T, A, p, n, examples):
     return sum
 
 def importance(tar, A, examples, rand=False):
+    #p. 1223 in the book
+    #the information gain from the attribute test on A is the expected reduction in entropy
     if rand: return random.uniform(0,1) 
     #positive
     try:
         p = examples[tar].value_counts()[1]
     except:
         p = 0
-    #p=random.randint(40,60)
     #negative
     try:
         n = examples[tar].value_counts()[2]
     except:
         n = 0
-    #n=random.randint(20,39)
-    #print(f"pos: {p}, neg: {n}")
+
     return B(p/(p+n)) - remainder(tar, A, p, n, examples)
 
 def get_id():
-    return (''.join(random.choices(string.ascii_lowercase, k=4)))
+    #make a random id
+    return (''.join(random.choices(string.ascii_lowercase, k=10)))
 
 
+
+def same_classification(e: pd.Series, tree: Digraph):
+    #return the classification
+    classificaion = e.unique()[0]
+    id = get_id()
+    tree.node(id, label = str(classificaion))
+    return [id, str(classificaion)]
 
 def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
 
-    if len(examples) == 1 or len(examples) == 0:
+    if examples.empty:
         return plurality_values(parent_examples,tree)
 
+    elif len(examples[target].unique()) == 1:
+        return same_classification(examples[target], tree)
 
-    elif same_classification(examples):
-        #return the classification
-        classific = examples[target].unique()[0]
-        return classific
-
-    elif len(attributes) == 0:
+    elif attributes.empty:
         return plurality_values(examples,tree)
     
     #find the most important attribute
@@ -83,13 +92,11 @@ def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
         dict = {}
         gain = {}
         for col in attributes:
-            gain[col] = importance(target, col, examples, rand=True)
-        #print(gain)
+            gain[col] = importance(target, col, examples, rand=False)
         
         max_list = sorted(gain.items(), key=lambda x: x[1], reverse=True)
         max_list = list(filter(lambda x: x[0] != '1.5', max_list))
         A = max_list[0][0]
-        #id = str(uuid.uuid1())
         id = get_id()
         tree.node(id, label=A)
         dict_list = {}
@@ -106,14 +113,20 @@ def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
 
 
 def plurality_values(e, tree=None):
-    #id = str(uuid.uuid1())
-    id = get_id()
-    tree.node(id, label = str(e[target].mode()[0]))
-    return  [id, e[target].mode()[0]]
+    # value = e[target].mode()[0]
+    # id = get_id()
+    # tree.node(id, label = str(value)+'plurality')
+    # return [id, str(value)]
+    value = e[target].value_counts().idxmax()
+    if value == 1:
+        id = get_id()
+        tree.node(id, label = '1+plura')
+        return [id, 'Died']
 
-def same_classification(e: pd.DataFrame):
-    e=e.to_numpy()
-    return((e==e[0]).all())
+    id = get_id()
+    tree.node(id, label = '2+plura')
+    return [id, 'Survived']
+
 
 
 
@@ -122,12 +135,16 @@ def same_classification(e: pd.DataFrame):
 
 def main():
     train = pd.read_csv("train.csv")
+    train.rename(columns={'1': 'a1', '2': 'a2'}, inplace=True)
+    print(train)
+
     test = pd.read_csv("test.csv")
     tree = Digraph(name="Decision Tree", filename="dtl")
     res = learn_decision_tree(train, train.columns, tree)
-    print(res[1])
-    print(train.columns)
+    #print(res[1])
     tree.render(view=True)
+    #print(train[target].unique()[0])
+    #print(value)
 
 
 if __name__ == "__main__":
