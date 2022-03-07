@@ -65,11 +65,9 @@ def get_id():
 
 
 def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
+
     if len(examples) == 1 or len(examples) == 0:
-        value = examples[target].unique()[0]
-        id = str(uuid.uuid1())
-        tree.node(id, label=str(value))
-        return plurality_values(parent_examples)
+        return plurality_values(parent_examples,tree)
 
 
     elif same_classification(examples):
@@ -78,7 +76,7 @@ def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
         return classific
 
     elif len(attributes) == 0:
-        return plurality_values(examples)
+        return plurality_values(examples,tree)
     
     #find the most important attribute
     else:
@@ -91,8 +89,8 @@ def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
         max_list = sorted(gain.items(), key=lambda x: x[1], reverse=True)
         max_list = list(filter(lambda x: x[0] != '1.5', max_list))
         A = max_list[0][0]
-        #print(gain, f"velg {A}")
-        id = str(uuid.uuid1())
+        #id = str(uuid.uuid1())
+        id = get_id()
         tree.node(id, label=A)
         dict_list = {}
         for v in examples[A].unique():
@@ -101,13 +99,16 @@ def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
             subtree = learn_decision_tree(exs, new_attrs, tree, examples)
             tree.edge(id, subtree[0], label=str(v))
             dict_list[v] = subtree[1]
-    
+        
+        dict[A] = dict_list
         return [id, dict]
 
 
 
-def plurality_values(e):
-    id = str(uuid.uuid1())
+def plurality_values(e, tree=None):
+    #id = str(uuid.uuid1())
+    id = get_id()
+    tree.node(id, label = str(e[target].mode()[0]))
     return  [id, e[target].mode()[0]]
 
 def same_classification(e: pd.DataFrame):
@@ -123,8 +124,9 @@ def main():
     train = pd.read_csv("train.csv")
     test = pd.read_csv("test.csv")
     tree = Digraph(name="Decision Tree", filename="dtl")
-    print(train)
     res = learn_decision_tree(train, train.columns, tree)
+    print(res[1])
+    print(train.columns)
     tree.render(view=True)
 
 
