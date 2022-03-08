@@ -1,4 +1,3 @@
-from msilib.schema import Class
 import numpy as np
 import pandas as pd
 from graphviz import Digraph
@@ -64,9 +63,8 @@ def importance(tar, A, examples, rand=False):
     return B(p/(p+n)) - remainder(tar, A, p, n, examples)
 
 def get_id():
-    #make a random id
+    #make a pseudorandom 10 character id
     return (''.join(random.choices(string.ascii_lowercase, k=10)))
-
 
 def plurality_values(e, tree=None):
     #return the most common value
@@ -82,6 +80,14 @@ def same_classification(e: pd.Series, tree: Digraph):
     tree.node(id, label = str(classificaion))
     return [id, str(classificaion)]
 
+def traverse(dict, row):
+    #traverse the tree (dictionary), used for testing the model
+    if dict == '1' or dict == '2': # stopping condition
+        return dict
+    for key in dict:
+        next = row.loc[key]
+    return traverse(dict[key][next], row) #recurse
+
 def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
 
     if examples.empty:
@@ -95,8 +101,8 @@ def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
     
     #find the most important attribute
     else:
-        dict = {}
-        gain = {}
+        dict = {} #store the model
+        gain = {} #information gain
         for col in attributes:
             gain[col] = importance(target, col, examples, rand=False)
         
@@ -105,33 +111,48 @@ def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
         A = max_list[0][0]
         id = get_id()
         tree.node(id, label=A)
-        dict_list = {}
+        subtree_dict = {} #used to the subtree under each v
         for v in examples[A].unique():
             exs = examples[examples[A]==v]
             new_attrs = attributes.copy().drop(A)
             subtree = learn_decision_tree(exs, new_attrs, tree, examples)
             tree.edge(id, subtree[0], label=str(v))
-            dict_list[v] = subtree[1]
+            subtree_dict[v] = subtree[1] #add the subtree under v
         
-        dict[A] = dict_list
+        dict[A] = subtree_dict
         return [id, dict]
 
 
-
-
-
 def main():
-    train = pd.read_csv("train.csv")
-    train.rename(columns={'1': 'a1', '2': 'a2'}, inplace=True)
-    print(train)
 
+    # load the data and rename clunky attributes
+    train = pd.read_csv("train.csv")
     test = pd.read_csv("test.csv")
-    tree = Digraph(name="Decision Tree", filename="dtl")
-    res = learn_decision_tree(train, train.columns, tree)
-    #print(res[1])
-    tree.render(view=True)
-    #print(train[target].unique()[0])
-    #print(value)
+    train.rename(columns={'1': 'a1', '2': 'a2'}, inplace=True)
+    test.rename(columns={'1': 'a1', '2': 'a2'}, inplace=True)
+
+    #initialize the tree
+    tree = Digraph(name="Decision Tree", filename="dtl.dot")
+
+    #learn the model
+    res = learn_decision_tree(train, train.columns, tree)[1]
+
+    #draw the tree
+    #tree.render(view=True)
+    a1 = list(res.keys())[0]
+    att = list(train.columns)
+    
+    ########### test the model ###########
+    right = 0 
+    wrong = 0
+    for _, row in test.iterrows():
+        prediction = traverse(res, row)
+        if prediction == str(row.loc['1.4']): #did we get it right?
+            right += 1
+        else:
+            wrong += 1
+    print(f"\nModel predicted {right} correct and {wrong} wrong. \nAccuracy = {round(right/(right+wrong),3)}")
+    ###########  end test ###########
 
 
 if __name__ == "__main__":
