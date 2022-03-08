@@ -4,7 +4,7 @@ from graphviz import Digraph
 import random
 import string
 
-random.seed(0)
+random.seed(10)
 target = '1.5'
 
 class Node:
@@ -14,7 +14,7 @@ class Node:
     def __init__(self, value):
         self.children = []
         self.value = value
-        self.id = str(value)
+        self.id = get_id()
             
 
 
@@ -23,22 +23,22 @@ def B(q):
     #returns the entropy
     return 0 if q == 1 or q == 0 else -(q*np.log2(q) + (1-q)*np.log2(1-q))
 
-def remainder(T, A, p, n, examples):
+def remainder(tar, A, p, n, examples):
     #p 1223 in the book
     #returns the expected remaining entropy after testing A
-    distinct_val = examples[A].unique()
+    distinct_vals = examples[A].unique()
     splits = []
-    for val in distinct_val:
+    for val in distinct_vals:
         splits.append(examples[examples[A] == val])
 
     sum = 0
     for split in splits:
         try:
-            pk = split[T].value_counts()[1]
+            pk = split[tar].value_counts()[1]
         except:
             pk = 0
         try:
-            nk = split[T].value_counts()[2]
+            nk = split[tar].value_counts()[2]
         except:
             nk = 0
     
@@ -88,7 +88,7 @@ def traverse(dict, row):
         next = row.loc[key]
     return traverse(dict[key][next], row) #recurse
 
-def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
+def learn_decision_tree(examples, attributes, tree=None, parent_examples=(), rand = False):
 
     if examples.empty:
         return plurality_values(parent_examples,tree)
@@ -101,10 +101,10 @@ def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
     
     #find the most important attribute
     else:
-        dict = {} #store the model
+        model = {} #store the model
         gain = {} #information gain
         for col in attributes:
-            gain[col] = importance(target, col, examples, rand=False)
+            gain[col] = importance(target, col, examples, rand)
         
         max_list = sorted(gain.items(), key=lambda x: x[1], reverse=True)
         max_list = list(filter(lambda x: x[0] != '1.5', max_list))
@@ -115,12 +115,12 @@ def learn_decision_tree(examples, attributes, tree=None, parent_examples=()):
         for v in examples[A].unique():
             exs = examples[examples[A]==v]
             new_attrs = attributes.copy().drop(A)
-            subtree = learn_decision_tree(exs, new_attrs, tree, examples)
+            subtree = learn_decision_tree(exs, new_attrs, tree, examples, rand=rand)
             tree.edge(id, subtree[0], label=str(v))
             subtree_dict[v] = subtree[1] #add the subtree under v
         
-        dict[A] = subtree_dict
-        return [id, dict]
+        model[A] = subtree_dict
+        return [id, model]
 
 
 def main():
@@ -135,12 +135,10 @@ def main():
     tree = Digraph(name="Decision Tree", filename="dtl.dot")
 
     #learn the model
-    res = learn_decision_tree(train, train.columns, tree)[1]
+    res = learn_decision_tree(train, train.columns, tree, rand = False)[1]
 
     #draw the tree
-    #tree.render(view=True)
-    a1 = list(res.keys())[0]
-    att = list(train.columns)
+    tree.render(view=True)
     
     ########### test the model ###########
     right = 0 
