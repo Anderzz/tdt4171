@@ -8,9 +8,7 @@ random.seed(10)
 target = '1.5'
 
 class Node:
-    """
-    Class Node
-    """
+    #not actually used
     def __init__(self, value):
         self.children = []
         self.value = value
@@ -63,8 +61,8 @@ def importance(tar, A, examples, rand=False):
     return B(p/(p+n)) - remainder(tar, A, p, n, examples)
 
 def get_id():
-    #make a pseudorandom 10 character id
-    return (''.join(random.choices(string.ascii_lowercase, k=10)))
+    #make a pseudorandom 25 character id
+    return (''.join(random.choices(string.ascii_lowercase, k=25)))
 
 def plurality_values(e, tree=None):
     #return the most common value
@@ -82,7 +80,8 @@ def same_classification(e: pd.Series, tree: Digraph):
 
 def traverse(dict, row):
     #traverse the tree (dictionary), used for testing the model
-    if dict == '1' or dict == '2': # stopping condition
+    classes = ['1', '2']
+    if dict in classes: # stopping condition
         return dict
     for key in dict:
         next = row.loc[key]
