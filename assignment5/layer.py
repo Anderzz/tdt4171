@@ -5,10 +5,10 @@ class Layer:
         self.input = None
         self.output = None
     
-    def forward(self, input_data):
+    def forward_propagation(self, input):
         pass
 
-    def backward(self, out_error, lr=0.01):
+    def backward_propagation(self, out_error, lr):
         pass
 
 

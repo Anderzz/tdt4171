@@ -7,18 +7,19 @@ class FCLayer(Layer):
         self.weights = np.random.rand(input_size, output_size) - 0.5
         self.bias = np.random.rand(1, output_size) - 0.5
 
-
-    def forward(self, input_data):
+    #forward pass
+    def forward_propagation(self, input_data):
         self.input = input_data
         self.output = np.dot(self.input, self.weights) + self.bias
         return self.output
 
-    def backward(self, out_error, lr=0.01):
+    def backward_propagation(self, out_error, lr):
         input_error = np.dot(out_error, self.weights.T)
         weights_error = np.dot(self.input.T, out_error)
         bias_error = out_error
 
-        #update params
+        #SGD
         self.weights -= lr * weights_error
         self.bias -= lr * bias_error
+        #pass the gradients on
         return input_error
