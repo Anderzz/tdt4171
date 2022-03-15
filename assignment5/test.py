@@ -13,7 +13,7 @@ y_train = np.array([[[0]], [[1]], [[1]], [[0]]])
 # network
 model = Network()
 model.add(Dense(2, 5))
-model.add(ActivationLayer(ReLU, dtanh))
+model.add(ActivationLayer(ReLU, dReLU))
 model.add(Dense(5, 3))
 model.add(ActivationLayer(ReLU, dReLU))
 model.add(Dense(3, 1))
