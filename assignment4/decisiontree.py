@@ -5,25 +5,37 @@ import random
 import string
 
 random.seed(10)
+#define the target variable
 target = '1.5'
 
-class Node:
-    #not actually used
-    def __init__(self, value):
-        self.children = []
-        self.value = value
-        self.id = get_id()
-            
-
-
 def B(q):
-    #p. 1222 in the book
+    """calculates and returns the entropy
+       p. 1222 in the book
+
+    Args:
+        q: boolean variable that is true with probability q
+
+    Returns:
+        entropy
+    """
     #returns the entropy
     return 0 if q == 1 or q == 0 else -(q*np.log2(q) + (1-q)*np.log2(1-q))
 
 def remainder(tar, A, p, n, examples):
-    #p 1223 in the book
-    #returns the expected remaining entropy after testing A
+    """calculates the expected remaining entropy 
+    after testing A, p. 1223 in the book
+
+    Args:
+        tar: the target attribute
+        A: the attribute we want to split on
+        p: # of cases where target attribute is 1
+        n: # of cases target attribute is 2 
+        examples: the dataset
+
+    Returns:
+        the remaining entropy after testing A
+    """
+
     distinct_vals = examples[A].unique()
     splits = []
     for val in distinct_vals:
@@ -44,6 +56,17 @@ def remainder(tar, A, p, n, examples):
     return sum
 
 def importance(tar, A, examples, rand=False):
+    """calculates the expected reduction in entropy from the test on A
+
+    Args:
+        tar: target attribute
+        A: the attribute we are testing on
+        examples: our dataset
+        rand (bool, optional): whether or not to use random importance. Defaults to False.
+
+    Returns:
+        the expected reduction in entropy
+    """
     #p. 1223 in the book
     #the information gain from the attribute test on A is the expected reduction in entropy
     if rand: return random.uniform(0,1) 
@@ -88,6 +111,19 @@ def traverse(dict, row):
     return traverse(dict[key][next], row) #recurse
 
 def learn_decision_tree(examples, attributes, tree=None, parent_examples=(), rand = False):
+    """
+    recursively learns a decision tree from examples
+
+    Args:
+        examples: dataframe, trainingset
+        attributes: columns of aforementioned dataset
+        tree: Digraph used to visualize
+        parent_examples: previos training set
+        rand: whether or not to use random importance
+
+    Returns:
+        dictionary containing the decision tree
+    """
 
     if examples.empty:
         return plurality_values(parent_examples,tree)
