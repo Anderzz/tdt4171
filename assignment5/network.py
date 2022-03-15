@@ -45,5 +45,6 @@ class Network:
                     error = layer.backward(error, lr)
             
             err /= samples
-            print(f"epoch {epoch+1}/{epochs}  error {err}")
+            if epoch % 10 == 0:
+                print(f"epoch {epoch+1}/{epochs}  error {err}")
 

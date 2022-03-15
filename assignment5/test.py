@@ -3,7 +3,7 @@ import numpy as np
 from network import Network
 from fclayer import Dense
 from activation_layer import ActivationLayer
-from activation_functions import tanh, dtanh
+from activation_functions import tanh, dtanh, ReLU, dReLU
 from loss import mse, dmse
 
 # training data
@@ -13,11 +13,11 @@ y_train = np.array([[[0]], [[1]], [[1]], [[0]]])
 # network
 model = Network()
 model.add(Dense(2, 5))
-model.add(ActivationLayer(tanh, dtanh))
+model.add(ActivationLayer(ReLU, dtanh))
 model.add(Dense(5, 3))
-model.add(ActivationLayer(tanh, dtanh))
+model.add(ActivationLayer(ReLU, dReLU))
 model.add(Dense(3, 1))
-model.add(ActivationLayer(tanh, dtanh))
+model.add(ActivationLayer(ReLU, dReLU))
 
 # train
 model.set_loss(mse, dmse)
