@@ -9,7 +9,7 @@ import pickle
 with open(file="scikit-learn-data.pickle", mode="rb") as file:
     data = pickle.load(file)
 
-vectorizer = HashingVectorizer(n_features=2**5)
+vectorizer = HashingVectorizer(n_features=2**5, binary=False)
 x_train = vectorizer.transform(data['x_train'])
 y_train = data['y_train']
 x_test = vectorizer.transform(data['x_test'])
