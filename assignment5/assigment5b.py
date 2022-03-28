@@ -30,8 +30,9 @@ in_len = x_train.shape[1]
 model = tf.keras.Sequential()
 model.add(tf.keras.layers.Embedding(vocab_size, 64, input_length=in_len))
 model.add(tf.keras.layers.LSTM(32, activation='tanh', recurrent_activation='sigmoid', dropout=0.2))
-model.add(tf.keras.layers.Dense(16,activation="tanh",kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-5, l2=1e-4)))
+model.add(tf.keras.layers.Dense(16,activation="tanh"))
 model.add(tf.keras.layers.Dense(1,activation="sigmoid"))
-model.compile(optimizer="Adam", loss="binary_crossentropy", metrics=['accuracy'])
+model.compile(optimizer="Adamax", loss="binary_crossentropy", metrics=['accuracy', 'AUC'])
 model.fit(x_train, y_train, epochs=5, batch_size=32, verbose=True)
 model.evaluate(x_test, y_test, verbose=True)
+
